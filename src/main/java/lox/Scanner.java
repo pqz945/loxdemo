@@ -116,6 +116,9 @@ public class Scanner {
         }
     }
 
+    /**
+     * 标识符
+     */
     private void identifier() {
         while (isAlphaNumeric(peek())) advance();
 
@@ -182,6 +185,10 @@ public class Scanner {
         return current >= source.length();
     }
 
+    /**
+     * 向前获取一个
+     * @return
+     */
     private char advance() {
         current++;
         return source.charAt(current - 1);
@@ -196,26 +203,49 @@ public class Scanner {
         tokens.add(new Token(type, text, literal, line));
     }
 
+    /**
+     * 查询字符
+     * @return
+     */
     private char peek() {
         if (isAtEnd()) return '\0';
         return source.charAt(current);
     }
 
+    /**
+     * 查询下一个字符
+     * @return
+     */
     private char peekNext() {
         if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
     }
 
+    /**
+     * 开头字符校验
+     * @param c
+     * @return
+     */
     private boolean isAlpha(char c) {
         return (c >= 'a' && c <= 'z') ||
                 (c >= 'A' && c <= 'Z') ||
                 c == '_';
     }
 
+    /**
+     * 开头字符是否数字
+     * @param c
+     * @return
+     */
     private boolean isAlphaNumeric(char c) {
         return isAlpha(c) || isDigit(c);
     }
 
+    /**
+     * 是否数字
+     * @param c
+     * @return
+     */
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
     }
