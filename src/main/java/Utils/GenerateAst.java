@@ -1,13 +1,8 @@
-package Utils;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * 生成语法规则类工具
- */
 public class GenerateAst {
 
     public static void main(String[] args) throws IOException {
@@ -25,13 +20,7 @@ public class GenerateAst {
         ));
     }
 
-    /**
-     * 输出基类 Expr
-     * @param outputDir
-     * @param baseName
-     * @param types
-     * @throws IOException
-     */
+
     private static void defineAst(
             String outputDir, String baseName, List<String> types)
             throws IOException {
@@ -44,6 +33,8 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        defineVisitor(writer, baseName, types);
+
         //生成子类
         for (String type : types) {
             String className = type.split(":")[0].trim();
@@ -51,17 +42,26 @@ public class GenerateAst {
             defineType(writer, baseName, className, fields);
         }
 
+        writer.println();
+        writer.println("  abstract <R> R accept(Visitor<R> visitor);");
+
         writer.println("}");
         writer.close();
     }
 
-    /**
-     * 子类类型
-     * @param writer
-     * @param baseName
-     * @param className
-     * @param fieldList
-     */
+    private static void defineVisitor(
+            PrintWriter writer, String baseName, List<String> types) {
+        writer.println("  interface Visitor<R> {");
+
+        for (String type : types) {
+            String typeName = type.split(":")[0].trim();
+            writer.println("    R visit" + typeName + baseName + "(" +
+                    typeName + " " + baseName.toLowerCase() + ");");
+        }
+
+        writer.println("  }");
+    }
+
     private static void defineType(
             PrintWriter writer, String baseName,
             String className, String fieldList) {
@@ -78,6 +78,14 @@ public class GenerateAst {
             writer.println("      this." + name + " = " + name + ";");
         }
 
+        writer.println("    }");
+
+        // Visitor pattern.
+        writer.println();
+        writer.println("    @Override");
+        writer.println("    <R> R accept(Visitor<R> visitor) {");
+        writer.println("      return visitor.visit" +
+                className + baseName + "(this);");
         writer.println("    }");
 
         // Fields.
